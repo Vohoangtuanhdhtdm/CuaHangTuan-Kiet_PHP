@@ -1,0 +1,6 @@
+RewriteEngine On
+# Bỏ qua nếu URL trỏ đến file hoặc thư mục có thật (như hình ảnh, file css)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+# Đẩy tất cả tham số vào biến 'url'
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
