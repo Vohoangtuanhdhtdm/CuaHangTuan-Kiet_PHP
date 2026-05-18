@@ -61,6 +61,11 @@ class Cart {
     }
     // Thêm sản phẩm vào giỏ
     public function addItem($cartId, $productId, $variantId, $quantity) {
+        // Fix lỗi 1366: Ép kiểu chuỗi rỗng thành NULL
+        if ($variantId === '') {
+            $variantId = null;
+        }
+
         // Kiểm tra xem item này đã có trong giỏ chưa
         $sqlCheck = "SELECT id, quantity FROM cart_items 
                      WHERE cart_id = :cart_id AND product_id = :product_id AND (variant_id = :variant_id OR (variant_id IS NULL AND :variant_id2 IS NULL))";

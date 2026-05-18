@@ -18,6 +18,10 @@ class CartController extends Controller {
         $variantId = $data['variant_id'] ?? null; // Có thể null nếu SP không có size/màu
         $quantity = $data['quantity'] ?? 1;
 
+        if ($variantId === '') {
+            $variantId = null;
+        }
+
         if (!$productId || !is_numeric($quantity) || $quantity < 1) {
             $this->jsonResponse(false, null, "Dữ liệu không hợp lệ.");
         }

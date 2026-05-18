@@ -103,6 +103,24 @@ class Order {
         }
     }
 
+    // Cập nhật riêng trạng thái thanh toán
+    public function updatePaymentStatus($id, $paymentStatus) {
+        $sql = "UPDATE orders SET payment_status = :payment_status WHERE id = :id";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            'payment_status' => $paymentStatus, 
+            'id' => $id
+        ]);
+    }
+
+    // Lấy thông tin đơn hàng dựa trên order_code (Nếu bạn chưa thêm ở bước trước)
+    public function getByOrderCode($orderCode) {
+        $sql = "SELECT * FROM orders WHERE order_code = :order_code";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['order_code' => $orderCode]);
+        return $stmt->fetch();
+    }
+
     // --- CÁC HÀM DÀNH CHO ADMIN ---
 
     // Lấy toàn bộ danh sách đơn hàng

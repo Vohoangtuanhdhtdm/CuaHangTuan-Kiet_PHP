@@ -1,0 +1,24 @@
+
+--- 2026-05-18 15:08:55 ---
+PAYLOAD: {"gateway":"MBBank","transactionDate":"2026-05-18 22:08:00","accountNumber":"0000251714550","subAccount":null,"code":null,"content":"O5CH7JDOPMGV-THANH TOAN ORDE91EF7","transferType":"in","description":"BankAPINotify O5CH7JDOPMGV-THANH TOAN ORDE91EF7","transferAmount":3000,"referenceCode":"FT26139398900394","accumulated":0,"id":59321210}
+Parsed -> Amount: 3000 | Content: O5CH7JDOPMGV-THANH TOAN ORDE91EF7
+LỖI: Không tìm thấy mã đơn hàng trong nội dung CK.
+
+--- 2026-05-18 15:25:10 ---
+PAYLOAD: {"gateway":"MBBank","transactionDate":"2026-05-18 22:25:00","accountNumber":"0000251714550","subAccount":null,"code":null,"content":"O5CH7JDOQGID-THANH TOAN ORDC176B8","transferType":"in","description":"BankAPINotify O5CH7JDOQGID-THANH TOAN ORDC176B8","transferAmount":3000,"referenceCode":"FT26139658159518","accumulated":0,"id":59325568}
+Parsed -> Amount: 3000 | Content: O5CH7JDOQGID-THANH TOAN ORDC176B8
+LỖI: Không tìm thấy mã đơn hàng trong nội dung CK.
+
+--- 2026-05-18 15:41:11 ---
+PAYLOAD: {"gateway":"MBBank","transactionDate":"2026-05-18 22:25:00","accountNumber":"0000251714550","subAccount":null,"code":null,"content":"O5CH7JDOQGID-THANH TOAN ORDC176B8","transferType":"in","description":"BankAPINotify O5CH7JDOQGID-THANH TOAN ORDC176B8","transferAmount":3000,"referenceCode":"FT26139658159518","accumulated":0,"id":59325568}
+Parsed -> Amount: 3000 | Content: O5CH7JDOQGID-THANH TOAN ORDC176B8
+Mã sau khi chuẩn hóa: ORD-C176B8
+TÌM THẤY ĐƠN: ID=18, Status hiện tại=pending, Cần thanh toán=3000.00
+THÀNH CÔNG: Đã cập nhật đơn hàng thành PAID!
+
+--- 2026-05-18 15:43:02 ---
+PAYLOAD: {"gateway":"MBBank","transactionDate":"2026-05-18 22:42:00","accountNumber":"0000251714550","subAccount":null,"code":null,"content":"O5CH7JDOR2DV-THANH TOAN ORD25C81D","transferType":"in","description":"BankAPINotify O5CH7JDOR2DV-THANH TOAN ORD25C81D","transferAmount":3000,"referenceCode":"FT26139366429840","accumulated":0,"id":59331483}
+Parsed -> Amount: 3000 | Content: O5CH7JDOR2DV-THANH TOAN ORD25C81D
+Mã sau khi chuẩn hóa: ORD-25C81D
+TÌM THẤY ĐƠN: ID=19, Status hiện tại=pending, Cần thanh toán=3000.00
+THÀNH CÔNG: Đã cập nhật đơn hàng thành PAID!
