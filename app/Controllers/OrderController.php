@@ -61,9 +61,35 @@ class OrderController extends Controller {
         }
     }
 
+    // API để Frontend liên tục kiểm tra trạng thái thanh toán
+    public function checkPaymentStatusAPI() {
+        $orderCode = $_GET['order_code'] ?? '';
+        if (empty($orderCode)) $this->jsonResponse(false, null, "Thiếu mã đơn hàng");
+
+        $orderModel = new \Models\Order();
+        $order = $orderModel->getByOrderCode($orderCode);
+
+        if ($order) {
+            // SỬA TẠI ĐÂY: Trả về payment_status
+            $this->jsonResponse(true, ['payment_status' => $order['payment_status']], "Thành công");
+        } else {
+            $this->jsonResponse(false, null, "Không tìm thấy đơn hàng");
+        }
+    }
+
     // Hiển thị trang thành công
     public function successView($orderCode) {
-        $this->render('pages/checkout-success', ['orderCode' => $orderCode]);
+       $orderModel = new Order();
+        
+        // Gọi hàm lấy đơn hàng bằng mã (Nếu file Model/Order.php chưa có hàm này, bạn nhớ thêm vào nhé)
+        $order = $orderModel->getByOrderCode($orderCode);
+
+        if (!$order) {
+            header("Location: /");
+            exit;
+        }
+
+        $this->render('pages/checkout-success', ['order' => $order]);
     }
 
     // Hiển thị danh sách lịch sử đơn hàng của User

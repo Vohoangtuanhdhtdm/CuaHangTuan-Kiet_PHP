@@ -17,7 +17,7 @@
             </div>
             
             <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200 flex items-center gap-4">
-                <label class="text-sm font-medium text-gray-700">Trạng thái:</label>
+                <label class="text-sm font-medium text-gray-700">Trạng thái giao hàng:</label>
                 <select id="orderStatus" class="border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500 py-1.5 pl-3 pr-8">
                     <option value="pending" <?= $order['status'] == 'pending' ? 'selected' : '' ?>>Chờ xử lý</option>
                     <option value="processing" <?= $order['status'] == 'processing' ? 'selected' : '' ?>>Đang chuẩn bị</option>
@@ -41,7 +41,20 @@
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Giao hàng & Thanh toán</h3>
                     <p class="mb-2"><span class="text-gray-500">Ngày đặt:</span> <?= date('d/m/Y H:i', strtotime($order['created_at'])) ?></p>
-                    <p class="mb-2"><span class="text-gray-500">Thanh toán:</span> <?= $order['payment_method'] === 'COD' ? 'Thanh toán khi nhận hàng' : 'Chuyển khoản' ?></p>
+                    <p class="mb-2 flex items-center gap-2">
+                        <span class="text-gray-500">Hình thức:</span> 
+                        <strong class="text-gray-900"><?= $order['payment_method'] === 'COD' ? 'Nhận hàng (COD)' : 'Chuyển khoản' ?></strong>
+                    </p>
+
+                    <p class="mb-2 flex items-center gap-2">
+                        <span class="text-gray-500">Thanh toán:</span>
+                        <?php if (strtoupper($order['payment_status'] ?? 'PENDING') === 'PAID'): ?>
+                            <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider">Đã thanh toán</span>
+                        <?php else: ?>
+                            <span class="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider">Chưa thanh toán</span>
+                        <?php endif; ?>
+                    </p>
+
                     <p class="mt-4 text-gray-500">Địa chỉ giao hàng:</p>
                     <p class="bg-gray-50 p-3 rounded mt-1 text-gray-800"><?= nl2br(htmlspecialchars($order['shipping_address'])) ?></p>
                 </div>

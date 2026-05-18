@@ -35,7 +35,17 @@
             </div>
             <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
                 <p><span class="text-gray-500 block mb-1">Ngày đặt hàng:</span> <strong><?= date('d/m/Y H:i', strtotime($order['created_at'])) ?></strong></p>
-                <p><span class="text-gray-500 block mb-1">Phương thức thanh toán:</span> <strong><?= $order['payment_method'] === 'COD' ? 'Thanh toán khi nhận hàng' : 'Chuyển khoản' ?></strong></p>
+                <p><span class="text-gray-500 block mb-1">Phương thức thanh toán:</span> <strong><?= $order['payment_method'] === 'COD' ? 'Thanh toán khi nhận hàng' : 'Chuyển khoản (VietQR)' ?></strong></p>
+                
+                <p class="md:col-span-2 flex items-center gap-2">
+                    <span class="text-gray-500">Trạng thái thanh toán:</span> 
+                    <?php if (strtoupper($order['payment_status'] ?? 'PENDING') === 'PAID'): ?>
+                        <span class="bg-green-100 text-green-700 px-3 py-1 rounded font-bold text-xs uppercase tracking-wider">Đã thanh toán</span>
+                    <?php else: ?>
+                        <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded font-bold text-xs uppercase tracking-wider">Chưa thanh toán</span>
+                    <?php endif; ?>
+                </p>
+
                 <p class="md:col-span-2"><span class="text-gray-500 block mb-1">Địa chỉ giao hàng:</span> <strong><?= nl2br(htmlspecialchars($order['shipping_address'])) ?></strong></p>
             </div>
         </div>

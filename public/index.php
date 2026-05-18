@@ -50,12 +50,10 @@ $router->get('/contact', 'HomeController@contact');
 $router->get('/blog', 'BlogController@index');
 $router->get('/blog/{slug}', 'BlogController@detail');
 
-// $router->post('/api/order/place', 'OrderController@placeOrderAPI');
-// $router->get('/order/success/{id}', 'OrderController@successView');
-
-
 
 // --- ROUTE API (Xử lý AJAX) ---
+$router->get('/api/order/status', 'OrderController@checkPaymentStatusAPI');
+$router->post('/api/webhook/sepay', 'WebhookController@sepayHandler');
 $router->post('/api/admin/posts/create', 'AdminPostController@storeAPI');
 $router->post('/api/admin/posts/update', 'AdminPostController@updateAPI');
 $router->post('/api/admin/posts/delete', 'AdminPostController@deleteAPI');

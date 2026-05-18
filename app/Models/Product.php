@@ -123,6 +123,50 @@ class Product {
         return $success ? $this->db->lastInsertId() : false;
     }
 
+    // BÊN TRONG FILE: app/Models/Product.php
+
+    // Đồng bộ (Thêm/Sửa/Xóa) Biến thể của sản phẩm
+    public function syncVariants($productId, $variantsData) {
+        // 1. Lấy danh sách ID biến thể đang có sẵn trong Database
+        $stmt = $this->db->prepare("SELECT id FROM product_variants WHERE product_id = :product_id");
+        $stmt->execute(['product_id' => $productId]);
+        $existingIds = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+
+        $keptIds = []; // Mảng chứa các ID được giữ lại / cập nhật
+
+        $insertStmt = $this->db->prepare("INSERT INTO product_variants (product_id, size, color, stock) VALUES (?, ?, ?, ?)");
+        $updateStmt = $this->db->prepare("UPDATE product_variants SET size = ?, color = ?, stock = ? WHERE id = ? AND product_id = ?");
+
+        if (!empty($variantsData)) {
+            foreach ($variantsData as $v) {
+                // Bỏ qua nếu dòng đó trống cả Size và Màu
+                if (empty($v['size']) && empty($v['color'])) continue; 
+                
+                $stock = !empty($v['stock']) ? (int)$v['stock'] : 0;
+                
+                if (!empty($v['id'])) {
+                    // Nếu có ID -> Cập nhật
+                    $updateStmt->execute([$v['size'], $v['color'], $stock, $v['id'], $productId]);
+                    $keptIds[] = $v['id'];
+                } else {
+                    // Nếu không có ID -> Thêm mới
+                    $insertStmt->execute([$productId, $v['size'], $v['color'], $stock]);
+                }
+            }
+        }
+
+        // 2. Tìm ra những biến thể đã bị người dùng bấm xóa trên giao diện
+        $idsToDelete = array_diff($existingIds, $keptIds);
+        
+        if (!empty($idsToDelete)) {
+            // Xóa hàng loạt các biến thể không còn tồn tại
+            $inQuery = implode(',', array_fill(0, count($idsToDelete), '?'));
+            $deleteStmt = $this->db->prepare("DELETE FROM product_variants WHERE product_id = ? AND id IN ($inQuery)");
+            $params = array_merge([$productId], $idsToDelete);
+            $deleteStmt->execute($params);
+        }
+    }
+
     // Lấy thông tin 1 sản phẩm theo ID (dùng cho form Edit)
     public function getById($id) {
         $sql = "SELECT * FROM products WHERE id = :id";

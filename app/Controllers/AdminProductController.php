@@ -86,9 +86,12 @@ class AdminProductController extends Controller {
         // Lưu vào DB
         $productModel = new Product();
         $productId = $productModel->create($categoryId, $name, $slug, $description, $price, $salePrice, $stock, $thumbnailPath);
-
+        
         if ($productId) {
-            $this->jsonResponse(true, ['redirect' => '/admin/products'], "Thêm sản phẩm thành công!");
+            $variants = $_POST['variants'] ?? [];
+            $productModel->syncVariants($productId, $variants);
+            
+            $this->jsonResponse(true, ['redirect' => '/admin/products'], "Lưu sản phẩm thành công!");
         } else {
             $this->jsonResponse(false, null, "Lỗi hệ thống khi lưu vào CSDL.");
         }
@@ -98,16 +101,13 @@ class AdminProductController extends Controller {
     public function editView($id) {
         $productModel = new Product();
         $product = $productModel->getById($id);
-
-        if (!$product) {
-            header("Location: /admin/products");
-            exit;
-        }
-
         $categories = $productModel->getCategories();
+        $variants = $productModel->getProductVariants($id); // Lấy biến thể
+
         $this->render('pages/admin/products/edit', [
             'product' => $product,
-            'categories' => $categories
+            'categories' => $categories,
+            'variants' => $variants // Truyền ra view
         ]);
     }
 
@@ -167,10 +167,13 @@ class AdminProductController extends Controller {
 
         // Thực hiện lệnh update vào DB 
         if ($productModel->update($id, $categoryId, $name, $slug, $description, $price, $salePrice, $stock, $thumbnailPath, $isActive)) {
-            $this->jsonResponse(true, ['redirect' => '/admin/products'], "Cập nhật thành công!");
-        } else {
-            $this->jsonResponse(false, null, "Lỗi cập nhật.");
-        }
+            $variants = $_POST['variants'] ?? [];
+            $productModel->syncVariants($id, $variants);
+            
+            $this->jsonResponse(true, ['redirect' => '/admin/products'], "Cập nhật sản phẩm thành công!");
+        }else {
+                $this->jsonResponse(false, null, "Lỗi cập nhật.");
+            }
     }
 
     // Xử lý API Xóa sản phẩm
