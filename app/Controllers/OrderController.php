@@ -11,7 +11,7 @@ class OrderController extends Controller {
 
     // Hiển thị giao diện thanh toán
     public function checkoutView() {
-        Middleware::requireLogin(); // Bắt buộc đăng nhập
+        Middleware::requireLogin(); 
 
         $cartModel = new Cart();
         $cartId = $cartModel->getCurrentCartId();
@@ -21,11 +21,8 @@ class OrderController extends Controller {
             header("Location: /cart");
             exit;
         }
-
-        // Lấy thông tin user (để điền sẵn địa chỉ)
         $userModel = new User();
         $user = $userModel->findByEmail($_SESSION['email'] ?? ''); 
-        // Lưu ý: Cần đảm bảo lúc login bạn đã lưu email hoặc lấy lại từ user_id
 
         $this->render('pages/checkout', [
             'items' => $items,
@@ -54,9 +51,8 @@ class OrderController extends Controller {
         $result = $orderModel->createOrder($_SESSION['user_id'], $cartId, $address, $paymentMethod);
 
         if (is_array($result) && isset($result['error'])) {
-            $this->jsonResponse(false, null, $result['error']); // Báo lỗi (VD: hết hàng)
+            $this->jsonResponse(false, null, $result['error']); 
         } else {
-            // Trả về order_code để frontend redirect
             $this->jsonResponse(true, ['order_code' => $result], "Đặt hàng thành công!");
         }
     }
@@ -70,7 +66,6 @@ class OrderController extends Controller {
         $order = $orderModel->getByOrderCode($orderCode);
 
         if ($order) {
-            // SỬA TẠI ĐÂY: Trả về payment_status
             $this->jsonResponse(true, ['payment_status' => $order['payment_status']], "Thành công");
         } else {
             $this->jsonResponse(false, null, "Không tìm thấy đơn hàng");
@@ -80,8 +75,6 @@ class OrderController extends Controller {
     // Hiển thị trang thành công
     public function successView($orderCode) {
        $orderModel = new Order();
-        
-        // Gọi hàm lấy đơn hàng bằng mã (Nếu file Model/Order.php chưa có hàm này, bạn nhớ thêm vào nhé)
         $order = $orderModel->getByOrderCode($orderCode);
 
         if (!$order) {
@@ -94,7 +87,7 @@ class OrderController extends Controller {
 
     // Hiển thị danh sách lịch sử đơn hàng của User
     public function historyView() {
-        Middleware::requireLogin(); // Bắt buộc đăng nhập
+        Middleware::requireLogin(); 
         
         $orderModel = new Order();
         $orders = $orderModel->getByUserId($_SESSION['user_id']);
@@ -109,7 +102,6 @@ class OrderController extends Controller {
         Middleware::requireLogin();
         
         $orderModel = new Order();
-        // Lấy đơn hàng và ĐẢM BẢO đơn này thuộc về user đang đăng nhập (Bảo mật IDOR)
         $order = $orderModel->getOrderForUser($id, $_SESSION['user_id']);
         
         if (!$order) {

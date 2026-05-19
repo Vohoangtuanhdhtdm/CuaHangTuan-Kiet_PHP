@@ -11,7 +11,6 @@ class Product {
         $this->db = Database::getConnection();
     }
 
-    // ĐÃ NÂNG CẤP: Bổ sung Limit và Offset để phân trang
     public function getProducts($category_id = null, $keyword = null, $limit = 8, $offset = 0) {
         $sql = "SELECT p.*, c.name as category_name 
                 FROM products p 
@@ -21,12 +20,10 @@ class Product {
         if ($category_id) $sql .= " AND p.category_id = :category_id";
         if ($keyword) $sql .= " AND (p.name LIKE :keyword1 OR p.description LIKE :keyword2)";
         
-        // Thêm Limit và Offset
         $sql .= " ORDER BY p.created_at DESC LIMIT :limit OFFSET :offset";
 
         $stmt = $this->db->prepare($sql);
 
-        // BẮT BUỘC dùng bindValue để ép kiểu về PDO::PARAM_INT cho LIMIT
         if ($category_id) $stmt->bindValue(':category_id', $category_id, \PDO::PARAM_INT);
         if ($keyword) {
             $stmt->bindValue(':keyword1', '%' . $keyword . '%', \PDO::PARAM_STR);
@@ -40,7 +37,6 @@ class Product {
         return $stmt->fetchAll();
     }
 
-    // THÊM MỚI: Hàm đếm tổng số sản phẩm để tính ra số trang
     public function getTotalProductsCount($category_id = null, $keyword = null) {
         $sql = "SELECT COUNT(*) as total FROM products p WHERE p.is_active = 1";
         
@@ -58,13 +54,12 @@ class Product {
         $stmt->execute();
         return $stmt->fetch()['total'];
     }
-    // Lấy toàn bộ danh mục để làm Menu Filter
+   
     public function getCategories() {
         $sql = "SELECT * FROM categories";
         return $this->db->query($sql)->fetchAll();
     }
 
-    // Lấy chi tiết 1 sản phẩm qua Slug
     public function getBySlug($slug) {
         $sql = "SELECT p.*, c.name as category_name 
                 FROM products p 
@@ -123,43 +118,35 @@ class Product {
         return $success ? $this->db->lastInsertId() : false;
     }
 
-    // BÊN TRONG FILE: app/Models/Product.php
 
-    // Đồng bộ (Thêm/Sửa/Xóa) Biến thể của sản phẩm
     public function syncVariants($productId, $variantsData) {
-        // 1. Lấy danh sách ID biến thể đang có sẵn trong Database
         $stmt = $this->db->prepare("SELECT id FROM product_variants WHERE product_id = :product_id");
         $stmt->execute(['product_id' => $productId]);
         $existingIds = $stmt->fetchAll(\PDO::FETCH_COLUMN);
 
-        $keptIds = []; // Mảng chứa các ID được giữ lại / cập nhật
+        $keptIds = []; 
 
         $insertStmt = $this->db->prepare("INSERT INTO product_variants (product_id, size, color, stock) VALUES (?, ?, ?, ?)");
         $updateStmt = $this->db->prepare("UPDATE product_variants SET size = ?, color = ?, stock = ? WHERE id = ? AND product_id = ?");
 
         if (!empty($variantsData)) {
             foreach ($variantsData as $v) {
-                // Bỏ qua nếu dòng đó trống cả Size và Màu
                 if (empty($v['size']) && empty($v['color'])) continue; 
                 
                 $stock = !empty($v['stock']) ? (int)$v['stock'] : 0;
                 
                 if (!empty($v['id'])) {
-                    // Nếu có ID -> Cập nhật
                     $updateStmt->execute([$v['size'], $v['color'], $stock, $v['id'], $productId]);
                     $keptIds[] = $v['id'];
                 } else {
-                    // Nếu không có ID -> Thêm mới
                     $insertStmt->execute([$productId, $v['size'], $v['color'], $stock]);
                 }
             }
         }
 
-        // 2. Tìm ra những biến thể đã bị người dùng bấm xóa trên giao diện
         $idsToDelete = array_diff($existingIds, $keptIds);
         
         if (!empty($idsToDelete)) {
-            // Xóa hàng loạt các biến thể không còn tồn tại
             $inQuery = implode(',', array_fill(0, count($idsToDelete), '?'));
             $deleteStmt = $this->db->prepare("DELETE FROM product_variants WHERE product_id = ? AND id IN ($inQuery)");
             $params = array_merge([$productId], $idsToDelete);
@@ -167,7 +154,6 @@ class Product {
         }
     }
 
-    // Lấy thông tin 1 sản phẩm theo ID (dùng cho form Edit)
     public function getById($id) {
         $sql = "SELECT * FROM products WHERE id = :id";
         $stmt = $this->db->prepare($sql);
@@ -175,7 +161,6 @@ class Product {
         return $stmt->fetch();
     }
 
-    // Cập nhật sản phẩm
     public function update($id, $categoryId, $name, $slug, $description, $price, $salePrice, $stock, $thumbnail, $isActive) {
         $sql = "UPDATE products 
                 SET category_id = :category_id, name = :name, slug = :slug, description = :description, 
@@ -191,7 +176,6 @@ class Product {
         ]);
     }
 
-    // Xóa sản phẩm
     public function delete($id) {
         $sql = "DELETE FROM products WHERE id = :id";
         $stmt = $this->db->prepare($sql);

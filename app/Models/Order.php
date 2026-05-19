@@ -12,10 +12,7 @@ class Order {
 
     public function createOrder($userId, $cartId, $address, $paymentMethod) {
         try {
-            // 1. BẮT ĐẦU TRANSACTION
             $this->db->beginTransaction();
-
-            // 2. Lấy thông tin giỏ hàng
             $cartModel = new Cart();
             $items = $cartModel->getCartItems($cartId);
 
@@ -28,11 +25,7 @@ class Order {
                 $price = $item['sale_price'] ? $item['sale_price'] : $item['price'];
                 $totalAmount += $price * $item['quantity'];
             }
-
-            // 3. Tạo mã đơn hàng ngẫu nhiên (VD: ORD-168932)
             $orderCode = 'ORD-' . strtoupper(substr(uniqid(), -6));
-
-            // 4. Insert vào bảng orders
             $sqlOrder = "INSERT INTO orders (user_id, order_code, total_amount, shipping_address, payment_method) 
                          VALUES (:user_id, :order_code, :total, :address, :payment)";
             $stmtOrder = $this->db->prepare($sqlOrder);
@@ -46,12 +39,10 @@ class Order {
             
             $orderId = $this->db->lastInsertId();
 
-            // 5. Insert vào order_items
             $sqlItem = "INSERT INTO order_items (order_id, product_id, variant_id, quantity, unit_price) 
                         VALUES (:order_id, :product_id, :variant_id, :qty, :price)";
             $stmtItem = $this->db->prepare($sqlItem);
 
-            // ĐÃ SỬA: Đổi tên tham số thành :qty1 và :qty2 để tránh lỗi HY093
             $sqlStockProd = "UPDATE products SET stock = stock - :qty1 WHERE id = :id AND stock >= :qty2";
             $stmtStockProd = $this->db->prepare($sqlStockProd);
 
@@ -70,7 +61,6 @@ class Order {
                     'price' => $price
                 ]);
 
-                // ĐÃ SỬA: Truyền giá trị quantity cho cả qty1 và qty2
                 if ($variantId) {
                     $stmtStockVar->execute([
                         'qty1' => $item['quantity'], 
@@ -88,16 +78,13 @@ class Order {
                 }
             }
 
-            // 6. Xóa giỏ hàng (Chỉ xóa cart_items để giữ session cart)
             $sqlClearCart = "DELETE FROM cart_items WHERE cart_id = :cart_id";
             $this->db->prepare($sqlClearCart)->execute(['cart_id' => $cartId]);
 
-            // 7. CHỐT GIAO DỊCH (Tất cả thành công)
             $this->db->commit();
             return $orderCode;
 
         } catch (\Exception $e) {
-            // NẾU CÓ LỖI -> HOÀN TÁC TOÀN BỘ
             $this->db->rollBack();
             return ['error' => $e->getMessage()];
         }
@@ -121,7 +108,6 @@ class Order {
         return $stmt->fetch();
     }
 
-    // --- CÁC HÀM DÀNH CHO ADMIN ---
 
     // Lấy toàn bộ danh sách đơn hàng
     public function getAllForAdmin() {
@@ -162,7 +148,6 @@ class Order {
         return $stmt->execute(['status' => $status, 'id' => $id]);
     }
 
-    // --- CÁC HÀM DÀNH CHO USER (FRONTEND) ---
 
     // Lấy danh sách đơn hàng của 1 khách hàng cụ thể
     public function getByUserId($userId) {

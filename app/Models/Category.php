@@ -47,7 +47,6 @@ class Category {
     }
 
     public function delete($id) {
-        // Lưu ý: Ràng buộc ON DELETE SET NULL trong CSDL sẽ tự lo việc cập nhật sản phẩm liên quan
         $sql = "DELETE FROM categories WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute(['id' => $id]);

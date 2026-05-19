@@ -9,12 +9,10 @@ class AuthController extends Controller {
     
     // Endpoint xử lý đăng nhập qua AJAX
     public function loginAPI() {
-        // Chỉ chấp nhận POST request
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->jsonResponse(false, null, "Method Not Allowed");
         }
         
-        // Đọc dữ liệu JSON từ request body (do Fetch API gửi lên)
         $data = json_decode(file_get_contents("php://input"), true);
         $email = trim($data['email'] ?? '');
         $password = $data['password'] ?? '';
@@ -26,18 +24,14 @@ class AuthController extends Controller {
         $userModel = new User();
         $user = $userModel->findByEmail($email);
 
-        // --- BẮT ĐẦU ĐOẠN DEBUG ---
         if (!$user) {
-            // Trường hợp 1: Hàm findByEmail không lấy ra được dữ liệu
             $this->jsonResponse(false, null, "Email không tồn tại trong hệ thống!");
         }
 
         if (!password_verify($password, $user['password_hash'])) {
-            // Trường hợp 2: Lấy được user, nhưng so sánh mật khẩu bị lệch
             $this->jsonResponse(false, null, "Sai mật khẩu! ");
         }
 
-        // Nếu qua được 2 ải trên thì cho đăng nhập (code giữ nguyên)
         session_regenerate_id(true);
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['role'] = $user['role_slug'];
@@ -46,7 +40,6 @@ class AuthController extends Controller {
         $this->jsonResponse(true, ['redirect' => '/'], "Đăng nhập thành công!");
     }
     
-    // Xử lý đăng xuất
     public function logout() {
         session_unset();
         session_destroy();
@@ -81,8 +74,6 @@ class AuthController extends Controller {
     }
 
     public function forgotPasswordAPI() {
-        // Trong thực tế, bạn sẽ dùng PHPMailer gửi link token.
-        // Ở môi trường dev này, ta sẽ reset thẳng về mật khẩu mặc định để test.
         $data = json_decode(file_get_contents("php://input"), true);
         $email = trim($data['email'] ?? '');
 
@@ -97,7 +88,7 @@ class AuthController extends Controller {
     }
 
     public function updateProfileAPI() {
-        Middleware::requireLogin(); // Chỉ user đã đăng nhập mới được gọi API này
+        Middleware::requireLogin(); 
 
         $data = json_decode(file_get_contents("php://input"), true);
         $name = trim($data['name'] ?? '');
@@ -113,9 +104,7 @@ class AuthController extends Controller {
         }
     }
 
-    /* --- RENDER VIEW --- */
     public function loginView() {
-        // Gọi hàm render từ Base Controller
         $this->render('pages/login'); 
     }
     public function registerView() { $this->render('pages/register'); }
@@ -123,9 +112,6 @@ class AuthController extends Controller {
     public function profileView() {
         Middleware::requireLogin(); // Chặn truy cập nếu chưa đăng nhập
         $userModel = new User();
-        // Lấy lại thông tin mới nhất từ DB (vì session chỉ lưu id, name, role)
-        // Lưu ý: Cần viết thêm hàm findById($id) trong UserModel
-        // Tạm thời truyền thông tin cơ bản:
         $this->render('pages/profile', [
             'userName' => $_SESSION['name'],
             'userRole' => $_SESSION['role']

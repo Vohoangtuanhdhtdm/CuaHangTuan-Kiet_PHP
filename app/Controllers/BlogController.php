@@ -22,7 +22,7 @@ class BlogController extends Controller {
         $post = $postModel->getBySlug($slug);
         
         if (!$post) {
-            header("Location: /blog"); // Trở về trang blog nếu không tìm thấy
+            header("Location: /blog"); 
             exit;
         }
 

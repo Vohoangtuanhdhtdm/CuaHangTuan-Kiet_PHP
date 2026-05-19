@@ -22,3 +22,10 @@ Parsed -> Amount: 3000 | Content: O5CH7JDOR2DV-THANH TOAN ORD25C81D
 Mã sau khi chuẩn hóa: ORD-25C81D
 TÌM THẤY ĐƠN: ID=19, Status hiện tại=pending, Cần thanh toán=3000.00
 THÀNH CÔNG: Đã cập nhật đơn hàng thành PAID!
+
+--- 2026-05-19 11:43:48 ---
+PAYLOAD: {"gateway":"MBBank","transactionDate":"2026-05-19 18:42:00","accountNumber":"0000251714550","subAccount":null,"code":null,"content":"THANH TOAN ORDD34D2C- Ma GD ACSP\/ zq142330","transferType":"in","description":"BankAPINotify THANH TOAN ORDD34D2C- Ma GD ACSP\/ zq142330","transferAmount":3000,"referenceCode":"FT26139849283029","accumulated":0,"id":59538486}
+Parsed -> Amount: 3000 | Content: THANH TOAN ORDD34D2C- MA GD ACSP/ ZQ142330
+Mã sau khi chuẩn hóa: ORD-D34D2C
+TÌM THẤY ĐƠN: ID=21, Status hiện tại=pending, Cần thanh toán=3000.00
+THÀNH CÔNG: Đã cập nhật đơn hàng thành PAID!
