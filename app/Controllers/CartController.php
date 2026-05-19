@@ -15,7 +15,7 @@ class CartController extends Controller {
 
         $data = json_decode(file_get_contents("php://input"), true);
         $productId = $data['product_id'] ?? null;
-        $variantId = $data['variant_id'] ?? null; // Có thể null nếu SP không có size/màu
+        $variantId = $data['variant_id'] ?? null; 
         $quantity = $data['quantity'] ?? 1;
 
         if ($variantId === '') {
@@ -28,14 +28,11 @@ class CartController extends Controller {
 
         $cartModel = new Cart();
         
-        // 1. Lấy ID giỏ hàng
         $cartId = $cartModel->getCurrentCartId();
 
-        // 2. Thêm vào giỏ
         $success = $cartModel->addItem($cartId, $productId, $variantId, $quantity);
 
         if ($success) {
-            // 3. Đếm lại số lượng để UI cập nhật con số trên giỏ hàng
             $totalCount = $cartModel->getCartCount($cartId);
             $this->jsonResponse(true, ['cart_count' => $totalCount], "Đã thêm vào giỏ hàng!");
         } else {
@@ -46,7 +43,7 @@ class CartController extends Controller {
     // Trang hiển thị giỏ hàng
     public function viewCart() {
         $cartModel = new Cart();
-        $productModel = new Product(); // Dùng để lấy variants
+        $productModel = new Product(); 
         
         $cartId = $cartModel->getCurrentCartId();
         $items = $cartModel->getCartItems($cartId);
@@ -55,8 +52,6 @@ class CartController extends Controller {
         foreach ($items as $key => $item) {
             $currentPrice = $item['sale_price'] ? $item['sale_price'] : $item['price'];
             $totalAmount += $currentPrice * $item['quantity'];
-            
-            // Lấy danh sách các Size/Màu của sản phẩm này để đưa vào Select Box
             $items[$key]['available_variants'] = $productModel->getProductVariants($item['product_id']);
         }
 
@@ -71,14 +66,13 @@ class CartController extends Controller {
 
         $data = json_decode(file_get_contents("php://input"), true);
         $cartItemId = $data['cart_item_id'] ?? null;
-        $quantity = max(1, intval($data['quantity'] ?? 1)); // Ép kiểu và đảm bảo >= 1
+        $quantity = max(1, intval($data['quantity'] ?? 1)); 
         $variantId = $data['variant_id'] ?? null;
 
         $cartModel = new Cart();
         $cartId = $cartModel->getCurrentCartId();
 
         if ($cartModel->updateItem($cartItemId, $cartId, $quantity, $variantId)) {
-            // Trả về số lượng mới nhất trên badge
             $cartCount = $cartModel->getCartCount($cartId);
             $this->jsonResponse(true, ['cart_count' => $cartCount], "Cập nhật thành công!");
         } else {

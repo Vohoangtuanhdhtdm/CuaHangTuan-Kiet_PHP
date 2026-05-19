@@ -16,10 +16,8 @@ class ProductController extends Controller {
         
         $categoryId = isset($_GET['category_id']) && is_numeric($_GET['category_id']) ? $_GET['category_id'] : null;
         $keyword = isset($_GET['search']) ? trim($_GET['search']) : null;
-        
-        // Logic tính toán phân trang
         $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
-        $limit = 8; // Chỉ lấy 8 sản phẩm mỗi trang
+        $limit = 8; 
         $offset = ($page - 1) * $limit;
 
         // Gọi DB

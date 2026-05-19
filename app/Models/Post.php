@@ -24,7 +24,6 @@ class Post {
         return $stmt->fetch();
     }
 
-    // --- CÁC HÀM DÀNH CHO ADMIN ---
 
     // Lấy toàn bộ bài viết (kể cả chưa xuất bản)
     public function getAllForAdmin() {
